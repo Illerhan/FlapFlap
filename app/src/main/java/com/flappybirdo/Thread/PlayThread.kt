@@ -9,8 +9,10 @@ import android.view.SurfaceHolder
 import androidx.core.graphics.scale
 import com.flappybirdo.Model.BackgroundImage
 import com.flappybirdo.Model.Bird
+import com.flappybirdo.Model.Cot
 import com.flappybirdo.Model.ScreenSize
 import com.flappybirdo.R
+import kotlin.random.Random
 
 internal class PlayThread : Thread {
 
@@ -33,6 +35,15 @@ internal class PlayThread : Thread {
     private var state : Int = 0
     private var velocityBird : Int = 0
 
+    var cot : Cot? = null
+    val numCot = 2
+    val velocityCot = 20
+    val minY = 250
+    val maxY = ScreenSize.SCREEN_HEIGHT - minY - 500
+    val kc = ScreenSize.SCREEN_WIDTH * 3/4
+    var cotArray : ArrayList<Cot> = arrayListOf()
+    var ran : Random = Random
+
     constructor(holder: SurfaceHolder, resources: Resources) {
         this.holder = holder
         this.resources = resources
@@ -40,6 +51,17 @@ internal class PlayThread : Thread {
         bird = Bird(resources)
         bitmapImage = BitmapFactory.decodeResource(resources, R.drawable.run_background)
         bitmapImage = bitmapImage?.let { ScaleResize(it) }
+        cot = Cot(resources)
+        createCot(resources)
+    }
+
+    private fun createCot(resources: Resources) {
+        for (i in 0 until numCot) {
+            val cot = Cot(resources)
+            cot.x = ScreenSize.SCREEN_WIDTH + kc * i
+            cot.ccY = ran.nextInt(maxY - minY) + minY
+            cotArray.add(cot)
+        }
     }
 
     override fun run() {
@@ -53,6 +75,7 @@ internal class PlayThread : Thread {
                     synchronized(holder) {
                         render(canvas)
                         RenderBird(canvas)
+                        RenderCot(canvas)
                     }
                 }
                 finally {
@@ -69,6 +92,23 @@ internal class PlayThread : Thread {
             }
         }
         Log.d(TAG, "Thread finish")
+    }
+
+    private fun RenderCot(canvas: Canvas) {
+        if (state == 1) {
+            for (i in 0 until numCot) {
+                if (cotArray.get(i).x < -cot!!.w){
+                    //nouveau tube ou x = kc + old_tube
+                    cotArray.get(i).x = cotArray.get(i).x + numCot*kc
+                    //cot.y = random
+                    cotArray.get(i).ccY = ran.nextInt(maxY - minY) + minY
+                }
+                //deplacement tube droite vers a gauche
+                cotArray.get(i).x = cotArray.get(i).x - velocityCot
+                canvas!!.drawBitmap(cot!!.cotTop, cotArray.get(i).x.toFloat(), cotArray.get(i).getTopY().toFloat(), null)
+                canvas!!.drawBitmap(cot!!.cotBottom, cotArray.get(i).x.toFloat(), cotArray.get(i).getBottomY().toFloat(), null)
+            }
+        }
     }
 
     private fun RenderBird(canvas: Canvas?) {
