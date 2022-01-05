@@ -11,6 +11,7 @@
         android:theme="@style/Theme.FlappyBirdo">
         <activity
             android:name=".UI.PlayGameActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

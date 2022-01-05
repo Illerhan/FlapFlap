@@ -6,7 +6,9 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.util.Log
 import android.view.SurfaceHolder
+import androidx.core.graphics.scale
 import com.flappybirdo.Model.BackgroundImage
+import com.flappybirdo.Model.ScreenSize
 import com.flappybirdo.R
 
 internal class PlayThread : Thread {
@@ -60,12 +62,24 @@ internal class PlayThread : Thread {
     }
     private fun render(canvas: Canvas?) {
         Log.d(TAG, "Render canvas")
-        val bitmapImage : Bitmap = BitmapFactory.decodeResource(resources, R.drawable.run_background)
+        var bitmapImage : Bitmap = BitmapFactory.decodeResource(resources, R.drawable.run_background)
+        bitmapImage = ScaleResize(bitmapImage)
         backgroundImage.x = backgroundImage.x - velocity
         if(backgroundImage.x < -bitmapImage.width){
             backgroundImage.x = 0
         }
 
         canvas!!.drawBitmap(bitmapImage,(backgroundImage.x).toFloat(),(backgroundImage.y).toFloat(),null)
+
+        if(backgroundImage.x < -bitmapImage.width + ScreenSize.SCREEN_WIDTH) {
+            canvas.drawBitmap(bitmapImage, (backgroundImage.x + bitmapImage.width).toFloat(), (backgroundImage.y).toFloat(),null)
+        }
+
+    }
+
+    private fun ScaleResize(bitmap: Bitmap): Bitmap {
+        var ratio : Float = (bitmap.width / bitmap.height).toFloat()
+        val scaleWidth : Int = (ratio + ScreenSize.SCREEN_HEIGHT).toInt()
+        return Bitmap.createScaledBitmap(bitmap,scaleWidth,ScreenSize.SCREEN_HEIGHT,false)
     }
 }

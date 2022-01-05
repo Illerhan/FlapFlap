@@ -9,6 +9,7 @@ import android.util.Log.INFO
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
+import com.flappybirdo.Model.ScreenSize
 import com.flappybirdo.UI.PlayGameActivity
 import java.util.logging.Level.INFO
 
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        ScreenSize.getScreenSize(this)
 
         val btnPlay = findViewById<ImageButton>(R.id.btnPlay);
 
