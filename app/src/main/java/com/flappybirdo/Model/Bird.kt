@@ -34,6 +34,9 @@ class Bird (res : Resources) {
         birdList.add(BitmapFactory.decodeResource(res, R.drawable.frame_5))
         birdList.add(BitmapFactory.decodeResource(res, R.drawable.frame_6))
         birdList.add(BitmapFactory.decodeResource(res, R.drawable.frame_7))
+        
+        x = ScreenSize.SCREEN_WIDTH/2 - birdList[0].width/2
+        y = ScreenSize.SCREEN_HEIGHT/2 - birdList[0].width/2
     }
     fun getBird(current : Int) : Bitmap{
         return birdList.get(current)
