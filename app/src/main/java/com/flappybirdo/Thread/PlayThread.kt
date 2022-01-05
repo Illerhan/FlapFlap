@@ -24,6 +24,7 @@ internal class PlayThread : Thread {
         }
     private val FPS : Int = (1000.0/60.0).toInt()
     private val backgroundImage = BackgroundImage()
+    private var bitmapImage : Bitmap? = null
     private var startTime : Long = 0
     private var frameTime : Long = 0
     private val velocity = 3
@@ -37,6 +38,8 @@ internal class PlayThread : Thread {
         this.resources = resources
         isRunning = true
         bird = Bird(resources)
+        bitmapImage = BitmapFactory.decodeResource(resources, R.drawable.run_background)
+        bitmapImage = bitmapImage?.let { ScaleResize(it) }
     }
 
     override fun run() {
@@ -71,7 +74,7 @@ internal class PlayThread : Thread {
     private fun RenderBird(canvas: Canvas?) {
         if (state == 1){
             if (bird.y < (ScreenSize.SCREEN_HEIGHT - bird.getBird(0).height) || velocityBird < 0){
-                velocityBird = velocityBird + 5 //Descend
+                velocityBird = velocityBird + 2 //Descend
                 bird.y = bird.y + velocityBird //Monte
             }
         }
@@ -86,17 +89,16 @@ internal class PlayThread : Thread {
 
     private fun render(canvas: Canvas?) {
         Log.d(TAG, "Render canvas")
-        var bitmapImage : Bitmap = BitmapFactory.decodeResource(resources, R.drawable.run_background)
-        bitmapImage = ScaleResize(bitmapImage)
         backgroundImage.x = backgroundImage.x - velocity
-        if(backgroundImage.x < -bitmapImage.width){
+        if(backgroundImage.x < -bitmapImage!!.width){
             backgroundImage.x = 0
         }
 
-        canvas!!.drawBitmap(bitmapImage,(backgroundImage.x).toFloat(),(backgroundImage.y).toFloat(),null)
+        bitmapImage?.let { canvas!!.drawBitmap(it,(backgroundImage.x).toFloat(),(backgroundImage.y).toFloat(),null) }
 
-        if(backgroundImage.x < -bitmapImage.width + ScreenSize.SCREEN_WIDTH) {
-            canvas.drawBitmap(bitmapImage, (backgroundImage.x + bitmapImage.width).toFloat(), (backgroundImage.y).toFloat(),null)
+        //loop de l'image
+        if(backgroundImage.x < -(bitmapImage!!.width + ScreenSize.SCREEN_WIDTH)) {
+            bitmapImage?.let { canvas!!.drawBitmap(it, (backgroundImage.x + bitmapImage!!.width).toFloat(), (backgroundImage.y).toFloat(),null) }
         }
 
     }
@@ -109,6 +111,9 @@ internal class PlayThread : Thread {
 
     fun Jump() {
         state = 1
-        velocityBird = - 30
+        //Bloque l'oiseau s'il arrive en haut de l'écran
+        if(bird.y > 0){
+            velocityBird = - 30
+        }
     }
 }
