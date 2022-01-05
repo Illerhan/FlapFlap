@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.SurfaceHolder
 import androidx.core.graphics.scale
 import com.flappybirdo.Model.BackgroundImage
+import com.flappybirdo.Model.Bird
 import com.flappybirdo.Model.ScreenSize
 import com.flappybirdo.R
 
@@ -26,11 +27,13 @@ internal class PlayThread : Thread {
     private var startTime : Long = 0
     private var frameTime : Long = 0
     private val velocity = 3
+    private val bird : Bird
 
     constructor(holder: SurfaceHolder, resources: Resources) {
         this.holder = holder
         this.resources = resources
         isRunning = true
+        bird = Bird(resources)
     }
 
     override fun run() {
@@ -43,6 +46,7 @@ internal class PlayThread : Thread {
                 try {
                     synchronized(holder) {
                         render(canvas)
+                        RenderBird(canvas)
                     }
                 }
                 finally {
@@ -60,6 +64,16 @@ internal class PlayThread : Thread {
         }
         Log.d(TAG, "Thread finish")
     }
+
+    private fun RenderBird(canvas: Canvas?) {
+        var current : Int = bird.currentFrame
+        canvas!!.drawBitmap(bird.getBird(current),bird.x.toFloat(),bird.y.toFloat(),null)
+        current++
+        if (current > bird.maxFrame)
+            current = 0
+        bird.currentFrame = current
+    }
+
     private fun render(canvas: Canvas?) {
         Log.d(TAG, "Render canvas")
         var bitmapImage : Bitmap = BitmapFactory.decodeResource(resources, R.drawable.run_background)
