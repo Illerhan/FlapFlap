@@ -1,6 +1,7 @@
 package com.flappybirdo.UI
 
 import android.content.Context
+import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import com.flappybirdo.Thread.PlayThread
@@ -44,5 +45,13 @@ class PlayView(context: Context?) : SurfaceView(context), SurfaceHolder.Callback
         }
     }
 
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        val ev = event!!.action
+        if(ev == MotionEvent.ACTION_DOWN) {
+            //L'oiseau saute lorsque l'on touche l'écran
+            playThread!!.Jump()
+        }
+        return true
+    }
 
 }

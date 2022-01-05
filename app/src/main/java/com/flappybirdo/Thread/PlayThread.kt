@@ -28,6 +28,9 @@ internal class PlayThread : Thread {
     private var frameTime : Long = 0
     private val velocity = 3
     private val bird : Bird
+    // game: 0 = stop / game: 1 = running / game: 2 = game over
+    private var state : Int = 0
+    private var velocityBird : Int = 0
 
     constructor(holder: SurfaceHolder, resources: Resources) {
         this.holder = holder
@@ -66,6 +69,13 @@ internal class PlayThread : Thread {
     }
 
     private fun RenderBird(canvas: Canvas?) {
+        if (state == 1){
+            if (bird.y < (ScreenSize.SCREEN_HEIGHT - bird.getBird(0).height) || velocityBird < 0){
+                velocityBird = velocityBird + 5 //Descend
+                bird.y = bird.y + velocityBird //Monte
+            }
+        }
+
         var current : Int = bird.currentFrame
         canvas!!.drawBitmap(bird.getBird(current),bird.x.toFloat(),bird.y.toFloat(),null)
         current++
@@ -95,5 +105,10 @@ internal class PlayThread : Thread {
         var ratio : Float = (bitmap.width / bitmap.height).toFloat()
         val scaleWidth : Int = (ratio + ScreenSize.SCREEN_HEIGHT).toInt()
         return Bitmap.createScaledBitmap(bitmap,scaleWidth,ScreenSize.SCREEN_HEIGHT,false)
+    }
+
+    fun Jump() {
+        state = 1
+        velocityBird = - 30
     }
 }
